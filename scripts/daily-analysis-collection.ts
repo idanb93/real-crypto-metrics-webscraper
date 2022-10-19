@@ -1,4 +1,4 @@
-import { exec } from "child_process"
+import { exec, spawn } from "child_process"
 import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
@@ -14,7 +14,21 @@ async function main() {
         console.log("Finished running the script")
       }
     }
-  )
+  ).stdout?.pipe(process.stdout)
+
+  // const child = spawn(
+  //   `cd ${process.env.PROJECT_FOLDER} && npx cypress run --browser chrome`,
+  //   [],
+  //   {
+  //     shell: true,
+  //     cwd: process.cwd(),
+  //     env: process.env,
+  //     stdio: ["inherit", "pipe", "pipe"],
+  //     windowsHide: false,
+  //   }
+  // )
+
+  // child.stdout.pipe(process.stdout)
 
   // try {
   //   await prisma.project_Analytics.create({
