@@ -5,6 +5,7 @@
     "strict": true,
     "lib": ["esnext"],
     "esModuleInterop": true,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "resolveJsonModule": true
   }
 }
