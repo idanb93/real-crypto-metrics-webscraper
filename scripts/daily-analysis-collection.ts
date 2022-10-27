@@ -1,13 +1,9 @@
-import { exec, execSync, spawn } from "child_process"
-import { PrismaClient } from "@prisma/client"
+import { ProjectAnalyticsObject } from "interfaces/project-analytics"
 import { logger } from "../logger/logger"
-import { projectsWebscrapingDetails } from "../data/data"
+import { execSync } from "child_process"
+import { PrismaClient } from "@prisma/client"
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
 import fs from "fs"
-import {
-  ProjectAnalytics,
-  ProjectAnalyticsObject,
-} from "interfaces/project-analytics"
 
 const prisma = new PrismaClient()
 
@@ -58,58 +54,86 @@ const main = async () => {
     }
   )
 
-  // try {
-  //   exec(
-  //     `cd ${process.env.PROJECT_FOLDER} && npx cypress run --browser chrome`,
-  //     (error, stdout) => {
-  //       if (error != null) {
-  //         console.log(`error: ${error.message}`)
-  //       } else {
-  //         console.log(stdout)
-  //         console.log("Finished running the script")
-  //       }
-  //     }
-  //   ).stdout?.pipe(process.stdout)
-  // } catch (err) {
-  //   logger.error(err)
-  // }
-
-  // const child = spawn(
-  //   `cd ${process.env.PROJECT_FOLDER} && npx cypress run --browser chrome`,
-  //   [],
-  //   {
-  //     shell: true,
-  //     cwd: process.cwd(),
-  //     env: process.env,
-  //     stdio: ["inherit", "pipe", "pipe"],
-  //     windowsHide: false,
-  //   }
-  // )
-
-  // child.stdout.pipe(process.stdout)
-
-  // try {
-  //   await prisma.project_Analytics.create({
-  //     data: {
-  //       projectId: analytics.projectId,
-  //       data: analytics.data,
-  //     },
-  //   })
-  //   console.log("Inserted new analytics successfully")
-  // } catch (err) {
-  //   console.log(err)
-  // }
-
   try {
     const cmd = `cd ${process.env.PROJECT_FOLDER} && npx cypress run --browser chrome`
-    execSync(cmd).toString()
+    execSync(cmd, {
+      encoding: "utf-8",
+      stdio: "inherit",
+    })
   } catch (err) {
     logger.error(err)
   }
 
-  // let projectsAnalytics = await import("../projects-analytics.json")
-  // console.log(projectsAnalytics.data)
-  // console.log(JSON.stringify(projectsAnalytics, null, 2))
+  const projectsAnalytics: string = fs.readFileSync(
+    "../projects-analytics.json",
+    "utf8"
+  )
+
+  const tempProjectAnalytics: ProjectAnalyticsObject =
+    JSON.parse(projectsAnalytics)
+
+  try {
+    const algorandAPIResponse: AxiosResponse = await axios.get(
+      "https://new-metrics.algorand.org/api/live-statistics/"
+    )
+
+    for (const project of tempProjectAnalytics.data) {
+      if (project.name === "Algorand") {
+        project.numOfValidators = parseInt(
+          algorandAPIResponse?.data?.live_statistics
+            ?.total_participation_node_count_for_last_7_days?.metric_data
+        )
+        project.totalAddresses = parseInt(
+          algorandAPIResponse?.data?.live_statistics
+            ?.total_created_address_count?.metric_data
+        )
+        project.dailyActiveAddresses = parseInt(
+          algorandAPIResponse?.data?.live_statistics
+            ?.total_active_address_count_for_last_30_days?.metric_data
+        )
+        project.transactionsPerSecond = parseInt(
+          algorandAPIResponse?.data?.live_statistics
+            ?.avg_transaction_count_per_second_for_last_7_days?.metric_data
+        )
+        project.dailyTransactions = parseInt(
+          algorandAPIResponse?.data?.live_statistics
+            ?.total_transaction_count_for_last_7_days?.metric_data
+        )
+      }
+    }
+
+    const AvalancheAPIResponse: AxiosResponse = await axios.get(
+      "https://avascan.info/api/v1/home/statistics"
+    )
+
+    for (const project of tempProjectAnalytics.data) {
+      if (project.name === "Avalanche") {
+        project.numOfValidators = AvalancheAPIResponse?.data?.validators
+        project.dailyTransactions =
+          AvalancheAPIResponse?.data?.lastTransactions24h
+        project.transactionsPerSecond = parseInt(
+          AvalancheAPIResponse?.data?.lastAvgTps24h
+        )
+      }
+    }
+
+    const SolanaAPIResponse: AxiosResponse = await axios.get(
+      "https://api.solscan.io/chaininfo?cluster="
+    )
+
+    for (const project of tempProjectAnalytics.data) {
+      if (project.name === "Solana") {
+        project.numOfValidators =
+          SolanaAPIResponse.data?.data?.networkInfo?.totalValidators
+        project.totalTransactions =
+          SolanaAPIResponse.data?.data?.networkInfo?.transactionCount
+        project.transactionsPerSecond =
+          SolanaAPIResponse.data?.data?.networkInfo?.tps
+      }
+    }
+  } catch (err) {
+    logger.error(err)
+  }
 
   // for (let project of projectsWebscrapingDetails) {
   //   try {
@@ -130,45 +154,22 @@ const main = async () => {
   //   }
   // }
 
-  const projectsAnalyticsR: string = fs.readFileSync(
-    "../projects-analytics.json",
-    "utf8"
-  )
-
-  logger.info(projectsAnalyticsR)
-
-  const tempProjectAnalytics: ProjectAnalyticsObject =
-    JSON.parse(projectsAnalyticsR)
-
-  try {
-    const res: AxiosResponse = await axios.get(
-      "https://new-metrics.algorand.org/api/live-statistics/"
-    )
-
-    const algorandProject = tempProjectAnalytics.data.find(
-      (project: ProjectAnalytics) => project.name === "Algorand"
-    )
-    if (algorandProject) {
-      algorandProject.numOfValidators = parseInt(
-        res?.data?.live_statistics
-          ?.total_participation_node_count_for_last_7_days?.metric_data
-      )
-      tempProjectAnalytics.data = tempProjectAnalytics.data.filter(
-        (project: ProjectAnalytics) => project.name !== "Algorand"
-      )
-      tempProjectAnalytics.data.push(algorandProject)
-      tempProjectAnalytics.data.sort((projectA, projectB) =>
-        projectA.id > projectB.id ? 1 : -1
-      )
-    }
-  } catch (err) {
-    logger.error(err)
-  }
-
   fs.writeFileSync(
     "../projects-analytics.json",
     JSON.stringify(tempProjectAnalytics, null, 2)
   )
+
+  // try {
+  //   await prisma.project_Analytics.create({
+  //     data: {
+  //       projectId: analytics.projectId,
+  //       data: analytics.data,
+  //     },
+  //   })
+  //   console.log("Inserted new analytics successfully")
+  // } catch (err) {
+  //   console.log(err)
+  // }
 }
 
 main()
