@@ -4,6 +4,12 @@ export interface ProjectAnalytics {
   numOfValidators?: number
   numOfNodes?: number
   numOfContributors?: number
+  totalAddresses?: number
+  dailyActiveAddresses?: number
+  totalValueLocked?: number
+  totalTransactions?: number
+  dailyTransactions?: number
+  transactionsPerSecond: number
 }
 
 export interface ProjectAnalyticsObject {
@@ -21,7 +27,7 @@ export interface ProjectWebscraperEssntials {
   owner?: string
   repo?: string
   hasUsedBySection?: boolean
-  pageLoadingTime: number
+  pageLoadingTime?: number
 }
 
 export interface GithubContributors {
@@ -44,4 +50,9 @@ export interface GithubContributors {
   type: string
   site_admin: boolean
   contributions: number
+}
+
+export interface AvalancheAPI {
+  provider: string
+  validators: number
 }

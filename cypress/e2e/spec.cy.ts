@@ -1,69 +1,75 @@
-import { xPathProjects } from "data/data"
+import { projectsUsingNodes, xPathProjects } from "data/data"
 
 describe("Blockchains Explorers Webscraper", () => {
-  // for (let project of Cypress.env("PROJECTS")) {
-  //   if (project.explorerUrl) {
-  //     it(`${project.name} Explorer`, () => {
-  //       cy.visit(project.explorerUrl)
-  //       cy.wait(project.pageLoadingTime)
-  //       Object.keys(xPathProjects).includes(project.name)
-  //         ? cy.xpath(xPathProjects[project.name]).invoke("text").as("nodes")
-  //         : cy.get(project.elementValue).invoke("text").as("nodes")
+  for (let project of Cypress.env("PROJECTS")) {
+    if (project.explorerUrl) {
+      it(`${project.name} Explorer`, () => {
+        const networkArchitecture = projectsUsingNodes.includes(project.name)
+          ? "numOfNodes"
+          : "numOfValidators"
+        cy.visit(project.explorerUrl)
+        cy.wait(project.pageLoadingTime | 3000)
+        Object.keys(xPathProjects).includes(project.name)
+          ? cy
+              .xpath(xPathProjects[project.name])
+              .invoke("text")
+              .as("numOfNodesOrValidators")
+          : cy
+              .get(project.elementValue)
+              .invoke("text")
+              .as("numOfNodesOrValidators")
 
-  //       cy.get("@nodes").then((nodes) => {
-  //         cy.log(`${nodes}`)
-  //         const nodesArray: String[] = project.isSplitRequired
-  //           ? new String(nodes).split(project.separator)
-  //           : []
-  //         cy.task("pushData", {
-  //           id: project.id,
-  //           name: project.name,
-  //           numOfValidators: project.isSplitRequired
-  //             ? parseInt(
-  //                 `${nodesArray[project.chosenSubstring]}`
-  //                   .replaceAll(",", "")
-  //                   .replaceAll(" ", "")
-  //               )
-  //             : parseInt(`${nodes}`.replaceAll(",", "").replaceAll(" ", "")),
-  //         })
-  //       })
-  //     })
-  //   }
-  // }
+        cy.get("@numOfNodesOrValidators").then((nodesOrValidators) => {
+          cy.log(`${nodesOrValidators}`)
+          const nodesOrValidatorsArray: string[] = project.isSplitRequired
+            ? `${nodesOrValidators}`.split(project.separator)
+            : []
+          cy.task("pushData", {
+            id: project.id,
+            name: project.name,
+            [`${networkArchitecture}`]: project.isSplitRequired
+              ? parseInt(
+                  `${nodesOrValidatorsArray[project.chosenSubstring]}`
+                    .replaceAll(",", "")
+                    .replaceAll(" ", "")
+                )
+              : parseInt(
+                  `${nodesOrValidators}`.replaceAll(",", "").replaceAll(" ", "")
+                ),
+          })
+        })
+      })
+    }
 
-  //   if (project.owner) {
-  //     it(`${project.owner} Github Account`, () => {
-  //       cy.visit(`https://github.com/${project.owner}/${project.repo}`)
-  //       let nthChild: string = "5"
-  //       if (project.hasUsedBySection) {
-  //         nthChild = "4"
-  //       }
-  //       cy.get(
-  //         `:nth-child(${nthChild}) > .BorderGrid-cell > .h4 > .Link--primary > .Counter`
-  //       )
-  //         .invoke("text")
-  //         .as("contributors")
-  //       cy.get("@contributors").then((contributors) => {
-  //         const contributorsAsAString = `${contributors}`
-  //         if (project.explorerUrl) {
-  //           cy.task("editData", {
-  //             projectName: project.name,
-  //             contributors: parseInt(contributorsAsAString),
-  //           })
-  //         } else {
-  //           cy.task("pushData", {
-  //             id: project.id,
-  //             name: project.name,
-  //             contributors: parseInt(contributorsAsAString),
-  //           })
-  //         }
-  //       })
-  //     })
-  //   }
-  // }
+    if (project.owner) {
+      it(`${project.owner} Github Account`, () => {
+        const nthChild: string = project.hasUsedBySection ? "4" : "5"
+        cy.visit(`https://github.com/${project.owner}/${project.repo}`)
+        cy.wait(2000)
+        cy.get(
+          `:nth-child(${nthChild}) > .BorderGrid-cell > .h4 > .Link--primary > .Counter`
+        )
+          .invoke("text")
+          .as("contributors")
+        cy.get("@contributors").then((contributors) => {
+          const contributorsAsAString: string = `${contributors}`
+          project.explorerUrl
+            ? cy.task("editData", {
+                projectName: project.name,
+                contributors: parseInt(contributorsAsAString),
+              })
+            : cy.task("pushData", {
+                id: project.id,
+                name: project.name,
+                contributors: parseInt(contributorsAsAString),
+              })
+        })
+      })
+    }
+  }
 
-  // it("test", () => {
-  //   cy.visit(`https://github.com/syscoin/pali-wallet`)
+  // it("Individual GitHub account Testing", () => {
+  //   cy.visit(`https://github.com/paritytech/polkadot`)
   //   let nthChild: string = "5"
   //   // if (project.hasUsedBySection) {
   //   //   nthChild = "4"
@@ -83,13 +89,11 @@ describe("Blockchains Explorers Webscraper", () => {
   //   })
   // })
 
-  // it.only("Test used for development", () => {
-  //   cy.visit("https://www.avax.network/validators")
-  //   cy.wait(7000)
-  //   cy.xpath("/html/body/div[2]/div/div[2]/div[2]/div[2]/div/div[2]")
-  //     // cy.get(
-  //     //   ".metrics_overview-page__first-row > :nth-child(3) > .overview-card__numeric-value > .overview-card__numeric-value-container > .is-vertically-centered > .animated-counter-container"
-  //     // )
+  // it.only("Individual Explorer Testing", () => {
+  //   cy.visit("https://avascan.info/stats/staking")
+  //   cy.wait(4000)
+  //   // cy.xpath("/html/body/div[2]/div/div[2]/div[2]/div[2]/div/div[2]")
+  //   cy.get(":nth-child(3) > .statsfigure > .statsfigure-main > span")
   //     .invoke("text")
   //     .as("nodes")
   //   cy.get("@nodes").then((nodes) => {
@@ -97,7 +101,7 @@ describe("Blockchains Explorers Webscraper", () => {
   //     const nodesArray = new String(nodes).split("/")
   //     cy.task("pushData", {
   //       project_id: 21,
-  //       name: "Kusama",
+  //       name: "Avalanche",
   //       numOfValidators: `${nodesArray[0]}`,
   //     })
   //   })

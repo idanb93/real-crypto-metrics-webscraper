@@ -7,7 +7,6 @@ export const logger = createLogger({
     format.colorize(),
     format.timestamp(),
     format.printf(
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       ({ timestamp, level, message }) => `[${timestamp}] ${level}: ${message}`
     )
   ),

@@ -21,7 +21,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     owner: "ethereum",
     repo: "go-ethereum",
     hasUsedBySection: true,
-    pageLoadingTime: 3000,
   },
   {
     id: 3,
@@ -33,7 +32,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     chosenSubstring: 0,
     owner: "ElrondNetwork",
     repo: "elrond-go",
-    pageLoadingTime: 3000,
   },
   {
     id: 4,
@@ -42,7 +40,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     elementValue: ".c-Validating-lkwqts",
     owner: "near",
     repo: "nearcore",
-    pageLoadingTime: 3000,
   },
   {
     id: 5,
@@ -54,17 +51,13 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     chosenSubstring: 5,
     owner: "Fantom-Foundation",
     repo: "go-opera",
-    pageLoadingTime: 3000,
   },
   {
     id: 6,
     name: "Avalanche",
-    explorerUrl: "https://www.avax.network/validators",
-    elementValue: "#tVal",
     owner: "ava-labs",
     repo: "avalanchego",
     hasUsedBySection: true,
-    pageLoadingTime: 8000,
   },
   {
     id: 7,
@@ -74,7 +67,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
       ".assetMetrics_validators-wrap__G0W5p > :nth-child(1) > .assetMetrics_value__wuZdv",
     owner: "harmony-one",
     repo: "harmony",
-    pageLoadingTime: 3000,
   },
   {
     id: 8,
@@ -86,17 +78,12 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     chosenSubstring: 5,
     owner: "bnb-chain",
     repo: "bsc",
-    pageLoadingTime: 3000,
   },
   {
     id: 9,
     name: "Solana",
-    explorerUrl: "https://solscan.io/validator",
-    elementValue:
-      ":nth-child(1) > .sc-hLeiDn > .ant-space > :nth-child(2) > .sc-ipEyDJ",
     owner: "solana-labs",
     repo: "solana",
-    pageLoadingTime: 3000,
   },
   {
     id: 10,
@@ -109,7 +96,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     chosenSubstring: 0,
     owner: "cosmos",
     repo: "cosmos-sdk",
-    pageLoadingTime: 3000,
   },
   {
     id: 11,
@@ -118,7 +104,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     elementValue: ":nth-child(5) > .sc-2e0047d8-2 > :nth-child(2)",
     owner: "Zilliqa",
     repo: "Zilliqa",
-    pageLoadingTime: 3000,
   },
   {
     id: 12,
@@ -126,7 +111,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     owner: "algorand",
     repo: "go-algorand",
     hasUsedBySection: true,
-    pageLoadingTime: 3000,
   },
   {
     id: 13,
@@ -136,7 +120,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
       ":nth-child(1) > .dashboard__column__info__primary__cell__info > span",
     owner: "maticnetwork",
     repo: "bor",
-    pageLoadingTime: 3000,
   },
   {
     id: 14,
@@ -148,7 +131,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     chosenSubstring: 0,
     owner: "paritytech",
     repo: "polkadot",
-    pageLoadingTime: 3000,
   },
   {
     id: 15,
@@ -158,7 +140,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
       ":nth-child(2) > .px-3 > .d-flex > .genesis-bar > .genesis-bar__right > .genesis-bar__item > .genesis-bar__title-1",
     owner: "cardano-foundation",
     repo: "CIPs",
-    pageLoadingTime: 3000,
   },
   {
     id: 16,
@@ -167,7 +148,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     elementValue: ":nth-child(3) > .sc-2e0047d8-2 > :nth-child(2)",
     owner: "ArweaveTeam",
     repo: "arweave",
-    pageLoadingTime: 3000,
   },
 
   // {
@@ -188,7 +168,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     isSplitRequired: true,
     separator: "/",
     chosenSubstring: 0,
-    pageLoadingTime: 3000,
   },
   {
     id: 18,
@@ -201,7 +180,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
     hasUsedBySection: true,
     owner: "syscoin",
     repo: "pali-wallet",
-    pageLoadingTime: 3000,
   },
   {
     id: 19,
@@ -211,12 +189,21 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
       ":nth-child(2) > :nth-child(2) > .InfoItem_container__BLIaH > .InfoItem_c__bnPu8",
     owner: "FUSIONFoundation",
     repo: "efsn",
-    pageLoadingTime: 3000,
+    pageLoadingTime: 4000,
   },
 ]
 
 export const xPathProjects = {
   Arweave: "/html/body/div/div[5]/div[2]/div/div[1]/div[5]/div[2]/span[2]",
   Zilliqa: "/html/body/div/div[5]/div[2]/div/div[1]/div[5]/div[2]/span[2]",
-  Avalanche: "/html/body/div[2]/div/div[2]/div[2]/div[2]/div/div[2]",
+  // Avalanche: "/html/body/div[2]/div/div[2]/div[2]/div[2]/div/div[2]",
 }
+
+export const projectsUsingNodes = [
+  "Bitcoin",
+  "Ethereum",
+  "Zilliqa",
+  "Cardano",
+  "Syscoin",
+  "Arweave",
+]
