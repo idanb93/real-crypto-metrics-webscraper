@@ -5,21 +5,18 @@ describe("Blockchains Explorers Webscraper", () => {
     if (project.explorerUrl) {
       it(`${project.name} Explorer`, () => {
         const networkArchitecture = projectsUsingNodes.includes(project.name)
-          ? "numOfNodes"
-          : "numOfValidators"
+          ? "nodes"
+          : "validators"
         cy.visit(project.explorerUrl)
         cy.wait(project.pageLoadingTime | 3000)
         Object.keys(xPathProjects).includes(project.name)
           ? cy
               .xpath(xPathProjects[project.name])
               .invoke("text")
-              .as("numOfNodesOrValidators")
-          : cy
-              .get(project.elementValue)
-              .invoke("text")
-              .as("numOfNodesOrValidators")
+              .as("nodesOrValidators")
+          : cy.get(project.elementValue).invoke("text").as("nodesOrValidators")
 
-        cy.get("@numOfNodesOrValidators").then((nodesOrValidators) => {
+        cy.get("@nodesOrValidators").then((nodesOrValidators) => {
           cy.log(`${nodesOrValidators}`)
           const nodesOrValidatorsArray: string[] = project.isSplitRequired
             ? `${nodesOrValidators}`.split(project.separator)

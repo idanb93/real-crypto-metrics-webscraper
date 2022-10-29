@@ -36,8 +36,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
   {
     id: 4,
     name: "Near",
-    explorerUrl: "https://explorer.near.org/nodes/validators",
-    elementValue: ".c-Validating-lkwqts",
     owner: "near",
     repo: "nearcore",
   },
@@ -202,8 +200,28 @@ export const xPathProjects = {
 export const projectsUsingNodes = [
   "Bitcoin",
   "Ethereum",
+  "Elrond",
   "Zilliqa",
   "Cardano",
   "Syscoin",
   "Arweave",
+]
+
+export const chains = [
+  {
+    chainShortName: "BTC",
+    chainFullName: "Bitcoin",
+  },
+  {
+    chainShortName: "ETH",
+    chainFullName: "Ethereum",
+  },
+  {
+    chainShortName: "FTM",
+    chainFullName: "Fantom",
+  },
+  {
+    chainShortName: "BSC",
+    chainFullName: "BSC",
+  },
 ]

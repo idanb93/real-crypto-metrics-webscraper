@@ -20,7 +20,7 @@ export default defineConfig({
         editData: ({ projectName, contributors }) => {
           data.data.forEach((project) => {
             if (project.name === projectName) {
-              project.numOfContributors = contributors
+              project.contributors = contributors
             }
           })
           return null

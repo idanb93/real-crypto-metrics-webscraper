@@ -1,15 +1,17 @@
 export interface ProjectAnalytics {
   id: number
   name: string
-  numOfValidators?: number
-  numOfNodes?: number
-  numOfContributors?: number
+  validators?: number
+  nodes?: number
+  observerNodes?: number
+  contributors?: number
   totalAddresses?: number
   dailyActiveAddresses?: number
-  totalValueLocked?: number
+  dailyNewAddresses?: number
   totalTransactions?: number
   dailyTransactions?: number
   transactionsPerSecond: number
+  totalValueLocked?: number
 }
 
 export interface ProjectAnalyticsObject {
