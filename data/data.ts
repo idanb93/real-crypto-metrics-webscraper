@@ -60,9 +60,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
   {
     id: 7,
     name: "Harmony",
-    explorerUrl: "https://www.stakingrewards.com/earn/harmony/metrics/",
-    elementValue:
-      ".assetMetrics_validators-wrap__G0W5p > :nth-child(1) > .assetMetrics_value__wuZdv",
     owner: "harmony-one",
     repo: "harmony",
   },
@@ -86,12 +83,6 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
   {
     id: 10,
     name: "Cosmos",
-    explorerUrl: "https://www.mintscan.io/cosmos/validators",
-    elementValue:
-      ":nth-child(2) > :nth-child(1) > .DataCard_dataCardWrapper__ZINBT > .DataCard_value__17jag",
-    isSplitRequired: true,
-    separator: " ",
-    chosenSubstring: 0,
     owner: "cosmos",
     repo: "cosmos-sdk",
   },
@@ -207,7 +198,7 @@ export const projectsUsingNodes = [
   "Arweave",
 ]
 
-export const chains = [
+export const okLinkSupportedChains = [
   {
     chainShortName: "BTC",
     chainFullName: "Bitcoin",
@@ -223,5 +214,16 @@ export const chains = [
   {
     chainShortName: "BSC",
     chainFullName: "BSC",
+  },
+]
+
+export const getLinkSupportedChains = [
+  {
+    chainShortName: "near",
+    chainFullName: "Near",
+  },
+  {
+    chainShortName: "one",
+    chainFullName: "Harmony",
   },
 ]
