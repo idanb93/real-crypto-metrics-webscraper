@@ -34,6 +34,9 @@ describe("Blockchains Explorers Webscraper", () => {
                   `${nodesOrValidators}`.replaceAll(",", "").replaceAll(" ", "")
                 ),
           })
+          cy.task("getData").then((data) => {
+            cy.log(JSON.stringify(data, null, 2))
+          })
         })
       })
     }
@@ -51,9 +54,14 @@ describe("Blockchains Explorers Webscraper", () => {
         cy.get("@contributors").then((contributors) => {
           const contributorsAsAString: string = `${contributors}`
           project.explorerUrl
-            ? cy.task("editData", {
-                projectName: project.name,
-                contributors: parseInt(contributorsAsAString),
+            ? cy.task("getProject", project.id).then((currentProject: any) => {
+                cy.task("editData", {
+                  id: currentProject?.id,
+                  name: currentProject?.name,
+                  validators: currentProject?.validators ?? 0,
+                  nodes: currentProject?.nodes ?? 0,
+                  contributors: parseInt(contributorsAsAString),
+                })
               })
             : cy.task("pushData", {
                 id: project.id,
@@ -61,9 +69,74 @@ describe("Blockchains Explorers Webscraper", () => {
                 contributors: parseInt(contributorsAsAString),
               })
         })
+        cy.task("getData").then((data) => {
+          cy.log(JSON.stringify(data, null, 2))
+        })
+      })
+    }
+
+    if (project.name === "Syscoin") {
+      it(`Syscoin`, () => {
+        cy.log("Syscoin")
+        cy.visit(`https://explorer.syscoin.org/`)
+        cy.wait(2000)
+        cy.get(".d-flex > .dashboard-banner-network-stats-value")
+          .invoke("text")
+          .as("totalTransactions")
+        cy.get(
+          ".dashboard-banner-network-stats-item-4 > .dashboard-banner-network-stats-value"
+        )
+          .invoke("text")
+          .as("totalAddresses")
+        cy.get("@totalTransactions").then((totalTransactions) => {
+          cy.get("@totalAddresses").then((totalAddresses) => {
+            cy.task("getProject", project.id).then((currentProject: any) => {
+              cy.task("editData", {
+                id: currentProject.id,
+                name: currentProject.name,
+                validators: currentProject?.validators ?? 0,
+                nodes: currentProject?.nodes ?? 0,
+                contributors: currentProject?.contributors ?? 0,
+                totalTransactions: parseInt(
+                  `${totalTransactions}`.replaceAll(",", "")
+                ),
+                totalAddresses: parseInt(
+                  `${totalAddresses}`.replaceAll(",", "")
+                ),
+              })
+            })
+          })
+        })
+        cy.task("getData").then((data) => {
+          cy.log(JSON.stringify(data, null, 2))
+        })
       })
     }
   }
+
+  // it(`Syscoin`, () => {
+  //   cy.visit(`https://explorer.syscoin.org/`)
+  //   cy.wait(2000)
+  //   cy.get(".d-flex > .dashboard-banner-network-stats-value")
+  //     .invoke("text")
+  //     .as("totalTransactions")
+  //   cy.get(
+  //     ".dashboard-banner-network-stats-item-4 > .dashboard-banner-network-stats-value"
+  //   )
+  //     .invoke("text")
+  //     .as("totalAddresses")
+  //   cy.get("@totalTransactions").then((totalTransactions) => {
+  //     cy.get("@totalAddresses").then((totalAddresses) => {
+  //       cy.task("editData", {
+  //         projectName: "Syscoin",
+  //         totalTransactions: parseInt(
+  //           `${totalTransactions}`.replaceAll(",", "")
+  //         ),
+  //         totalAddresses: parseInt(`${totalAddresses}`.replaceAll(",", "")),
+  //       })
+  //     })
+  //   })
+  // })
 
   // it("Individual GitHub account Testing", () => {
   //   cy.visit(`https://github.com/paritytech/polkadot`)
@@ -105,7 +178,8 @@ describe("Blockchains Explorers Webscraper", () => {
   // })
 
   after(() => {
-    cy.task("getData").then((data) => {
+    cy.task("sortData")
+    cy.task("getData").then((data: any) => {
       cy.log(data)
       cy.writeFile("projects-analytics.json", data)
     })

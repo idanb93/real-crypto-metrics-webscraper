@@ -182,7 +182,7 @@ export const projectsWebscrapingDetails: ProjectWebscraperEssntials[] = [
   },
 ]
 
-export const xPathProjects = {
+export const xPathProjects: any = {
   Arweave: "/html/body/div/div[5]/div[2]/div/div[1]/div[5]/div[2]/span[2]",
   Zilliqa: "/html/body/div/div[5]/div[2]/div/div[1]/div[5]/div[2]/span[2]",
   // Avalanche: "/html/body/div[2]/div/div[2]/div[2]/div[2]/div/div[2]",
@@ -196,6 +196,85 @@ export const projectsUsingNodes = [
   "Cardano",
   "Syscoin",
   "Arweave",
+]
+
+export const defilama = [
+  {
+    coinGecko: "bitcoin",
+    projectName: "Bitcoin",
+  },
+  {
+    coinGecko: "ethereum",
+    projectName: "Ethereum",
+  },
+  {
+    coinGecko: "elrond-erd-2",
+    projectName: "Elrond",
+  },
+  {
+    coinGecko: "near",
+    projectName: "Near",
+  },
+  {
+    coinGecko: "fantom",
+    projectName: "Fantom",
+  },
+  {
+    coinGecko: "avalanche-2",
+    projectName: "Avalanche",
+  },
+  {
+    coinGecko: "harmony",
+    projectName: "Harmony",
+  },
+  {
+    coinGecko: "binancecoin",
+    projectName: "BSC",
+  },
+  {
+    coinGecko: "solana",
+    projectName: "Solana",
+  },
+  {
+    coinGecko: "cosmos",
+    projectName: "Cosmos",
+  },
+  {
+    coinGecko: "zilliqa",
+    projectName: "Zilliqa",
+  },
+  {
+    coinGecko: "algorand",
+    projectName: "Algorand",
+  },
+  {
+    coinGecko: "matic-network",
+    projectName: "Polygon",
+  },
+  {
+    coinGecko: "polkadot",
+    projectName: "Polkadot",
+  },
+  {
+    coinGecko: "matic-network",
+    projectName: "Polygon",
+  },
+  {
+    coinGecko: "cardano",
+    projectName: "Cardano",
+  },
+  {
+    coinGecko: "kusama",
+    projectName: "Kusama",
+  },
+  {
+    coinGecko: "syscoin",
+    projectName: "Syscoin",
+  },
+  {
+    coinGecko: "fsn",
+    projectName: "Fusion",
+  },
 ]
 
 export const okLinkSupportedChains = [

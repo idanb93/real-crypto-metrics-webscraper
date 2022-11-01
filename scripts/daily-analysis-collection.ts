@@ -1,26 +1,19 @@
 import { ProjectAnalyticsObject } from "interfaces/project-analytics"
 import { logger } from "../logger/logger"
-import { execSync } from "child_process"
 import { PrismaClient } from "@prisma/client"
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
 import fs from "fs"
-import { getLinkSupportedChains, okLinkSupportedChains } from "../data/data"
+import {
+  defilama,
+  getLinkSupportedChains,
+  okLinkSupportedChains,
+} from "../data/data"
 
 const prisma = new PrismaClient()
 
 const main = async () => {
-  // try {
-  //   const cmd = `cd ${process.env.PROJECT_FOLDER} && npx cypress run --browser chrome`
-  //   execSync(cmd, {
-  //     encoding: "utf-8",
-  //     stdio: "inherit",
-  //   })
-  // } catch (err) {
-  //   logger.error(err)
-  // }
-
   const projectsAnalytics: string = fs.readFileSync(
-    "../projects-analytics.json",
+    `${process.env.PROJECT_FOLDER}/projects-analytics.json`,
     "utf8"
   )
 
@@ -90,6 +83,7 @@ const main = async () => {
   }
 
   try {
+    logger.info("Querying Algorand API")
     const AlgorandAPIResponse: AxiosResponse = await axios.get(
       "https://new-metrics.algorand.org/api/live-statistics/"
     )
@@ -119,19 +113,7 @@ const main = async () => {
       }
     }
 
-    const AlgorandAPIResponse2: AxiosResponse = await axios.get(
-      "https://new-metrics.algorand.org/api/statistics/on-chain-value/"
-    )
-
-    for (const project of tempProjectAnalytics.data) {
-      if (project.name === "Algorand") {
-        project.totalValueLocked = +(
-          AlgorandAPIResponse2.data?.total_value_locked_combined?.metric_data *
-          1
-        ).toFixed()
-      }
-    }
-
+    logger.info("Querying Avalanche API")
     const AvalancheAPIResponse: AxiosResponse = await axios.get(
       "https://avascan.info/api/v1/home/statistics"
     )
@@ -146,46 +128,24 @@ const main = async () => {
       }
     }
 
-    const AvalancheAPIResponse2: AxiosResponse = await axios.get(
-      "https://avascan.info/api/v1/statistics"
-    )
-
-    for (const project of tempProjectAnalytics.data) {
-      if (project.name === "Avalanche") {
-        project.totalValueLocked = +(
-          AvalancheAPIResponse?.data?.price *
-          AvalancheAPIResponse2?.data?.totalStake
-        ).toFixed(2)
-
-        AvalancheAPIResponse2?.data?.validators
-      }
-    }
-
+    logger.info("Querying Solana API")
     const SolanaAPIResponse: AxiosResponse = await axios.get(
-      "https://api.solscan.io/market?symbol=SOL&cluster="
-    )
-
-    const SolanaAPIResponse2: AxiosResponse = await axios.get(
       "https://api.solscan.io/chaininfo?cluster="
     )
 
     for (const project of tempProjectAnalytics.data) {
       if (project.name === "Solana") {
         project.validators =
-          SolanaAPIResponse2.data?.data?.networkInfo?.totalValidators
+          SolanaAPIResponse.data?.data?.networkInfo?.totalValidators
         project.totalTransactions =
-          SolanaAPIResponse2.data?.data?.networkInfo?.transactionCount
+          SolanaAPIResponse.data?.data?.networkInfo?.transactionCount
         project.transactionsPerSecond = +(
-          SolanaAPIResponse2.data?.data?.networkInfo?.tps * 1
-        ).toFixed(2)
-        project.totalValueLocked = +(
-          SolanaAPIResponse2?.data?.data?.solStakeOverview?.total *
-          SolanaAPIResponse?.data?.data?.priceUsdt *
-          1
+          SolanaAPIResponse.data?.data?.networkInfo?.tps * 1
         ).toFixed(2)
       }
     }
 
+    logger.info("Querying Elrond API")
     const ElrondAPIResponse: AxiosResponse = await axios.get(
       "https://api.elrondmonitor.com/stats/validators"
     )
@@ -197,6 +157,7 @@ const main = async () => {
       }
     }
 
+    logger.info("Querying Elrond API 2")
     const ElrondAPIResponse2: AxiosResponse = await axios.get(
       "https://api.elrondmonitor.com/stats"
     )
@@ -205,13 +166,10 @@ const main = async () => {
       if (project.name === "Elrond") {
         project.totalTransactions = ElrondAPIResponse2.data?.total_txs
         project.totalAddresses = ElrondAPIResponse2.data?.total_accounts
-        project.totalValueLocked = +(
-          ElrondAPIResponse2?.data?.price *
-          ElrondAPIResponse?.data?.active_stake
-        ).toFixed(2)
       }
     }
 
+    logger.info("Querying Cosmos API")
     const CosmosAPIResponse: AxiosResponse = await axios.get(
       "https://api.cosmostation.io/v1/status"
     )
@@ -224,12 +182,31 @@ const main = async () => {
       }
     }
 
+    logger.info("Querying OkLink API")
     for (const chain of okLinkSupportedChains) {
       await okLinkAPI(chain.chainShortName, chain.chainFullName)
     }
 
+    logger.info("Querying getBlock API")
     for (const chain of getLinkSupportedChains) {
       await getBlockAPI(chain.chainShortName, chain.chainFullName)
+    }
+
+    logger.info("Querying defiLama API")
+    const defiLamaResponse: AxiosResponse = await axios.get(
+      "https://api.llama.fi/chains"
+    )
+
+    for (const defiLamaProject of defilama) {
+      for (const tempProject of tempProjectAnalytics.data) {
+        if (tempProject.name === defiLamaProject.projectName) {
+          tempProject.totalValueLocked = +defiLamaResponse.data
+            ?.find(
+              (project: any) => project.gecko_id === defiLamaProject.coinGecko
+            )
+            .tvl.toFixed(2)
+        }
+      }
     }
   } catch (err) {
     logger.error(err)
@@ -255,7 +232,7 @@ const main = async () => {
   // }
 
   fs.writeFileSync(
-    "../projects-analytics.json",
+    `${process.env.PROJECT_FOLDER}/projects-analytics.json`,
     JSON.stringify(tempProjectAnalytics, null, 2)
   )
 

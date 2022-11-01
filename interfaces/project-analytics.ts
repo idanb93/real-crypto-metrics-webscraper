@@ -10,7 +10,7 @@ export interface ProjectAnalytics {
   dailyNewAddresses?: number
   totalTransactions?: number
   dailyTransactions?: number
-  transactionsPerSecond: number
+  transactionsPerSecond?: number
   totalValueLocked?: number
 }
 
