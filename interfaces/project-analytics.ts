@@ -58,3 +58,8 @@ export interface AvalancheAPI {
   provider: string
   validators: number
 }
+
+export interface CosmosAPI2 {
+  validator: string
+  value: number
+}

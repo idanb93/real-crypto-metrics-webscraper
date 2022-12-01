@@ -1,4 +1,5 @@
 import { projectsUsingNodes, xPathProjects } from "data/data"
+import { ProjectAnalytics } from "interfaces/project-analytics"
 
 describe("Blockchains Explorers Webscraper", () => {
   for (let project of Cypress.env("PROJECTS")) {
@@ -53,21 +54,49 @@ describe("Blockchains Explorers Webscraper", () => {
           .as("contributors")
         cy.get("@contributors").then((contributors) => {
           const contributorsAsAString: string = `${contributors}`
-          project.explorerUrl
-            ? cy.task("getProject", project.id).then((currentProject: any) => {
-                cy.task("editData", {
-                  id: currentProject?.id,
-                  name: currentProject?.name,
-                  validators: currentProject?.validators ?? 0,
-                  nodes: currentProject?.nodes ?? 0,
+
+          // Checks if there is data of the current project in the global data array:
+          cy.task("getData").then((data: any) => {
+            cy.log(data.data)
+            const selectedProject = data.data.find(
+              (currentTestProject: ProjectAnalytics) =>
+                project.name === currentTestProject.name
+            )
+            selectedProject
+              ? cy
+                  .task("getProject", project.id)
+                  .then((currentProject: any) => {
+                    cy.task("editData", {
+                      id: currentProject?.id ?? project.id,
+                      name: currentProject?.name ?? project.name,
+                      validators: currentProject?.validators ?? 0,
+                      nodes: currentProject?.nodes ?? 0,
+                      contributors: parseInt(contributorsAsAString),
+                    })
+                  })
+              : // If there is no data about the current project push it.
+                cy.task("pushData", {
+                  id: project.id,
+                  name: project.name,
                   contributors: parseInt(contributorsAsAString),
                 })
-              })
-            : cy.task("pushData", {
-                id: project.id,
-                name: project.name,
-                contributors: parseInt(contributorsAsAString),
-              })
+          })
+
+          // project.explorerUrl
+          //   ? cy.task("getProject", project.id).then((currentProject: any) => {
+          //       cy.task("editData", {
+          //         id: currentProject?.id ?? project.id,
+          //         name: currentProject?.name ?? project.name,
+          //         validators: currentProject?.validators ?? 0,
+          //         nodes: currentProject?.nodes ?? 0,
+          //         contributors: parseInt(contributorsAsAString),
+          //       })
+          //     })
+          //   : cy.task("pushData", {
+          //       id: project.id,
+          //       name: project.name,
+          //       contributors: parseInt(contributorsAsAString),
+          //     })
         })
         cy.task("getData").then((data) => {
           cy.log(JSON.stringify(data, null, 2))

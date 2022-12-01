@@ -1,4 +1,7 @@
-import { ProjectAnalyticsObject } from "interfaces/project-analytics"
+import {
+  CosmosAPI2,
+  ProjectAnalyticsObject,
+} from "interfaces/project-analytics"
 import { logger } from "../logger/logger"
 import { PrismaClient } from "@prisma/client"
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
@@ -171,16 +174,41 @@ const main = async () => {
 
     logger.info("Querying Cosmos API")
     const CosmosAPIResponse: AxiosResponse = await axios.get(
-      "https://api.cosmostation.io/v1/status"
+      "https://api.cosmoscan.net/transactions"
     )
 
     for (const project of tempProjectAnalytics.data) {
       if (project.name === "Cosmos") {
-        project.validators = CosmosAPIResponse.data?.unjailed_validator_num
-        project.totalTransactions = CosmosAPIResponse.data?.total_txs_num
-        // project.totalAddresses = CosmosAPIResponse.data?.total_accounts
+        project.totalTransactions = CosmosAPIResponse.data?.total
       }
     }
+
+    logger.info("Querying Cosmos API 2")
+    const CosmosAPIResponse2: AxiosResponse = await axios.get(
+      "https://api.cosmoscan.net/validators/top/jailed"
+    )
+
+    for (const project of tempProjectAnalytics.data) {
+      if (project.name === "Cosmos") {
+        project.validators = CosmosAPIResponse2.data?.reduce(
+          (accumulator: number, currentValue: CosmosAPI2) =>
+            accumulator + currentValue.value,
+          0
+        )
+      }
+    }
+
+    // const CosmosAPIResponse: AxiosResponse = await axios.get(
+    //   "https://api.cosmostation.io/v1/status"
+    // )
+
+    // for (const project of tempProjectAnalytics.data) {
+    //   if (project.name === "Cosmos") {
+    //     project.validators = CosmosAPIResponse.data?.unjailed_validator_num
+    //     project.totalTransactions = CosmosAPIResponse.data?.total_txs_num
+    //     // project.totalAddresses = CosmosAPIResponse.data?.total_accounts
+    //   }
+    // }
 
     logger.info("Querying OkLink API")
     for (const chain of okLinkSupportedChains) {
